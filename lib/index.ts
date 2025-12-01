@@ -1,5 +1,3 @@
-export * from "./chunker";
+export * from "./index-core";
 export * from "./parser";
-export * from "./renderer";
 export * from "./semidown";
-export * from "./types";

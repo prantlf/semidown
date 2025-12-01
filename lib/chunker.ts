@@ -1,10 +1,18 @@
 import type { ChunkerEvent, Listener } from "./types";
 
 /**
+ * Customize a MarkdownStreamChunker instance.
+ */
+export interface MarkdownStreamChunkerOptions {
+  blockIdPrefix?: string
+}
+
+/**
  * Splits a stream of markdown text into block sub‑streams,
  * emitting start/update/end events per block, based on blank lines.
  */
 export class MarkdownStreamChunker {
+  private blockIdPrefix: string;
   private buffer = "";
   private nextBlockId = 1;
   private currentBlockId: string | null = null;
@@ -14,6 +22,10 @@ export class MarkdownStreamChunker {
     "block-end": [],
     end: [],
   };
+
+  constructor(options?: MarkdownStreamChunkerOptions) {
+    this.blockIdPrefix = options?.blockIdPrefix ?? "block-";
+  }
 
   /**
    * Write a chunk of markdown text into the chunker.
@@ -71,7 +83,7 @@ export class MarkdownStreamChunker {
 
   private emitStart(): void {
     if (!this.currentBlockId) {
-      this.currentBlockId = `block-${this.nextBlockId++}`;
+      this.currentBlockId = `${this.blockIdPrefix}${this.nextBlockId++}`;
       this.emit("block-start", { blockId: this.currentBlockId });
     }
   }

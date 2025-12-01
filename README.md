@@ -33,6 +33,41 @@ const interval = setInterval(() => {
 }, 50);
 ```
 
+If you need to customise the `Marked` instance, or do not need `Shiki` for syntax highlighting, you can use the import `semidown/core` instead.
+
+```typescript
+import { SemidownCore, MarkdownParserCore } from "semidown/core";
+import { Marked } from "marked";
+
+const targetElement = document.getElementById("output");
+const marked = new Marked();
+const parser = new MarkdownParserCore({ marked });
+const semidown = new SemidownCore({ targetElement, parser });
+```
+
+For full customisation, you can create instances of `chunker`, `parser` and `renderer` on your own.
+
+```typescript
+import {
+  SemidownCore,
+  MarkdownStreamChunker,
+  MarkdownParserCore,
+  HTMLRenderer
+} from "semidown/core";
+import { Marked } from "marked";
+
+const targetElement = document.getElementById("output");
+const chunker = new MarkdownStreamChunker({ blockIdPrefix: "blk=" });
+const marked = new Marked();
+const parser = new MarkdownParserCore({ marked });
+const renderer = new HTMLRenderer({
+  targetElement,
+  datasetProperty: "mdBlkId",
+  completeCssClass: "md-blk-complete"
+});
+const semidown = new SemidownCore({ chunker, parser, renderer });
+```
+
 ## Key Features
 
 - **Semi-incremental Parsing:**

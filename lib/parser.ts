@@ -1,19 +1,21 @@
 import { Marked } from "marked";
 import markedShiki from "marked-shiki";
 import { bundledLanguages, createHighlighter } from "shiki/bundle/web";
+import { MarkdownParserCore } from "./parser-core";
 
 /**
  * Wraps marked.parse() and detects unclosed fenced-code blocks.
  */
-export class MarkdownParser {
-  private marked: Marked | null = null;
+export class MarkdownParser extends MarkdownParserCore {
   private initPromise: Promise<void>;
 
   constructor() {
-    this.initPromise = this.initialize();
+    const marked = new Marked();
+    super({ marked });
+    this.initPromise = this.initialize(marked);
   }
 
-  private async initialize(): Promise<void> {
+  private async initialize(marked: Marked): Promise<void> {
     const supportedLanguages = Object.keys(bundledLanguages);
 
     const highlighter = await createHighlighter({
@@ -21,7 +23,7 @@ export class MarkdownParser {
       themes: ["dark-plus"],
     });
 
-    this.marked = new Marked().use(
+    marked.use(
       markedShiki({
         highlight(code, lang, _props) {
           const highlightableLanguage = supportedLanguages.includes(lang) ? lang : "text";
@@ -43,14 +45,6 @@ export class MarkdownParser {
    */
   async parse(markdown: string): Promise<{ html: string; isComplete: boolean }> {
     await this.initPromise;
-
-    if (!this.marked) {
-      throw new Error("Markdown parser not initialized");
-    }
-
-    const html = await this.marked.parse(markdown);
-    const fences = (markdown.match(/```/g) || []).length;
-    const isComplete = fences % 2 === 0;
-    return { html, isComplete };
+    return super.parse(markdown);
   }
 }
