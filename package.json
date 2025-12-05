@@ -25,7 +25,6 @@
   "files": [
     "dist",
     "lib",
-    "README.md",
     "CHANGELOG.md"
   ],
   "types": "dist/index.d.ts",
