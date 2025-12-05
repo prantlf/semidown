@@ -1,0 +1,53 @@
+name: Test or Release and Publish Pages
+
+on:
+  push:
+    branches:
+      - master
+    tags-ignore:
+      - '**'
+    paths-ignore:
+      - '**/*.md'
+      - LICENSE
+  pull_request:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  test-or-release-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: pnpm/action-setup@v5
+      with:
+        version: latest
+    - uses: actions/setup-node@v5
+      with:
+        node-version: 'lts/*'
+        registry-url: 'https://registry.npmjs.org'
+        cache: 'pnpm'
+    - uses: actions/configure-pages@v5
+      if: ${{ github.ref_name == 'master' }}
+    - run: pnpm i --frozen-lockfile --no-verify-store-integrity
+    - run: npm run build
+    - uses: prantlf/publish-release-action@v1
+      if: ${{ github.ref_name == 'master' }}
+      with:
+        no-archives: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/upload-pages-artifact@v3
+      if: ${{ github.ref_name == 'master' }}
+      with:
+        path: "dist-site"
+    - uses: actions/deploy-pages@v4
+      if: ${{ github.ref_name == 'master' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

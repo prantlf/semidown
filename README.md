@@ -2,12 +2,19 @@
 
 A semi-incremental streaming markdown parser and renderer for the web, designed for handling LLM streaming out.
 
-[Try the live demo!](https://chuanqisun.github.io/semidown/)
+[Try the live demo!](https://prantlf.github.io/semidown/)
+
+This is a fork of the original project with the following enhancements:
+
+* ESM, CJS and UMD exports, not minified and minified, including source maps
+* Default exports load external dependencies (`marked`, `marked-shiki` and `shiki/bundle/web`)
+* The `core` exports have no dependencies, neither external, nor bundled
+* The `bundle` exports include the dependencies (`marked`, `marked-shiki` and `shiki/bundle/web`)
 
 ## Install
 
 ```bash
-npm install semidown
+npm install @prantlf/semidown
 ```
 
 ## Usage
@@ -15,7 +22,7 @@ npm install semidown
 Below is a simplified usage example. See `src/main.ts` for a full-featured demo with UI controls.
 
 ```typescript
-import { Semidown } from "semidown";
+import { Semidown } from "@prantlf/semidown";
 
 const outputContainer = document.getElementById("output");
 const parser = new Semidown(outputContainer);
@@ -33,10 +40,10 @@ const interval = setInterval(() => {
 }, 50);
 ```
 
-If you need to customise the `Marked` instance, or do not need `Shiki` for syntax highlighting, you can use the import `semidown/core` instead.
+If you need to customise the `Marked` instance, or do not need `Shiki` for syntax highlighting, you can use the import `@prantlf/semidown/core` instead.
 
 ```typescript
-import { SemidownCore, MarkdownParserCore } from "semidown/core";
+import { SemidownCore, MarkdownParserCore } from "@prantlf/semidown/core";
 import { Marked } from "marked";
 
 const targetElement = document.getElementById("output");
@@ -53,7 +60,7 @@ import {
   MarkdownStreamChunker,
   MarkdownParserCore,
   HTMLRenderer
-} from "semidown/core";
+} from "@prantlf/semidown/core";
 import { Marked } from "marked";
 
 const targetElement = document.getElementById("output");
@@ -67,6 +74,27 @@ const renderer = new HTMLRenderer({
 });
 const semidown = new SemidownCore({ chunker, parser, renderer });
 ```
+
+## Exports
+
+Exported files in the `dist` directory:
+
+| Distributed file        | Loading statement                                  | Format | Minified | Dependencies | Environment   |
+|:------------------------|:---------------------------------------------------|--------|----------|--------------|---------------|
+| `dist/index.cjs`        | `import '@prantlf/semidown'`                       |   EJS  |    no    |   external   |      node     |
+| `dist/index.js`         | `import '@prantlf/semidown'`                       |   EJS  |    no    |   external   | node, browser |
+| `dist/index.min.js`     | `import 'https://unpkg.com/.../dist/index.min.js'` |   EJS  |    yes   |   external   |    browser    |
+| `dist/index.umd.js`     | `<script src=".../dist/index.umd.js">`             |   UMD  |    no    |   external   |    browser    |
+| `dist/index.umd.min.js` | `<script src=".../dist/index.umd.min.js">`         |   UMD  |    yes   |   external   |    browser    |
+| `dist/index-core.cjs`        | `import '@prantlf/semidown/core'`                       | EJS | no  |    none    |      node     |
+| `dist/index-core.js`         | `import '@prantlf/semidown/core'`                       | EJS | no  |    none    | node, browser |
+| `dist/index-core.min.js`     | `import 'https://unpkg.com/.../dist/index-core.min.js'` | EJS | yes |    none    |    browser    |
+| `dist/index-core.umd.js`     | `<script src=".../dist/index-core.umd.js">`             | UMD | no  |    none    |    browser    |
+| `dist/index-core.umd.min.js` | `<script src=".../dist/index-core.umd.min.js">`         | UMD | yes |    none    |    browser    |
+| `dist/index-bundle.js`         | `import 'https://unpkg.com/.../dist/index-bundle.js'`     | EJS | no  | bundled |   browser    |
+| `dist/index-bundle.min.js`     | `import 'https://unpkg.com/.../dist/index-bundle.min.js'` | EJS | yes | bundled |   browser    |
+| `dist/index-bundle.umd.js`     | `<script src=".../dist/index-bundle.umd.js">`             | UMD | no  | bundled |   browser    |
+| `dist/index-bundle.umd.min.js` | `<script src=".../dist/index-bundle.umd.min.js">`         | UMD | yes | bundled |   browser    |
 
 ## Key Features
 
@@ -98,6 +126,16 @@ The included demo (`src/main.ts`) provides a UI to:
   - Full incremental parsing at the inline level is complex and error-prone, especially with partial tokens and nested formatting.
   - By incrementally parsing at the block level and re-rendering inlines, the library achieves a robust balance: fast updates for new blocks, and correct inline formatting as content grows.
 
+
+## Contributing
+
+In lieu of a formal styleguide, take care to maintain the existing coding style. Lint and test your code.
+
 ## License
 
-MIT
+Copyright (c) 2022-2025 Chuanqisun Sun \
+Copyright (C) 2022-2025 Ferdinand Prantl
+
+Licensed under the [MIT License].
+
+[MIT License]: http://en.wikipedia.org/wiki/MIT_License
