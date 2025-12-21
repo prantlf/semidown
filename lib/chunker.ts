@@ -31,6 +31,7 @@ export class MarkdownStreamChunker {
    * Write a chunk of markdown text into the chunker.
    */
   write(chunk: string): void {
+    let fencedData: string | null = null;
     let data = this.buffer + chunk;
     this.buffer = "";
 
@@ -42,14 +43,41 @@ export class MarkdownStreamChunker {
       const part = data.slice(0, idx);
       data = data.slice(idx + 2);
 
-      this.emitUpdate(part);
-      this.emitEnd();
+      // If inside a fenced block, emit an update together with all
+      // previous blocks.
+      if (fencedData !== null) {
+        fencedData = fencedData + part + "\n\n";
+      }
+
+      // Consider a block complete only if no fenced block is open.
+      const isComplete = this.hasBalancedFences(part)
+        ? fencedData === null
+        : fencedData !== null;
+
+      this.emitUpdate(fencedData ?? part, isComplete);
+
+      // Enter or leave a fenced block if unbalanced ticks are detected.
+      if (!isComplete) {
+        if (fencedData === null) {
+          fencedData = part + "\n\n";
+        } else {
+          fencedData = null;
+        }
+      }
+
+      // Emit an end only if not inside a fenced block.
+      if (fencedData === null) {
+        this.emitEnd(isComplete);
+      }
     }
 
     // 2) Whatever remains is the current block's ongoing content
+    if (fencedData !== null) {
+      data = fencedData + data;
+    }
     if (data.length > 0) {
       this.buffer = data;
-      this.emitUpdate(data);
+      this.emitUpdate(data, false);
     }
   }
 
@@ -59,9 +87,10 @@ export class MarkdownStreamChunker {
    */
   end(): void {
     if (this.buffer.length > 0) {
-      this.emitUpdate(this.buffer);
+      const isComplete = this.hasBalancedFences(this.buffer);
+      this.emitUpdate(this.buffer, isComplete);
       this.buffer = "";
-      this.emitEnd();
+      this.emitEnd(isComplete);
     }
     this.emit("end");
   }
@@ -88,14 +117,19 @@ export class MarkdownStreamChunker {
     }
   }
 
-  private emitUpdate(content: string): void {
+  private emitUpdate(content: string, isComplete: boolean): void {
     this.emitStart();
-    this.emit("block-update", { blockId: this.currentBlockId!, content });
+    this.emit("block-update", { blockId: this.currentBlockId!, content, isComplete });
   }
 
-  private emitEnd(): void {
+  private emitEnd(isComplete: boolean): void {
     if (!this.currentBlockId) return;
-    this.emit("block-end", { blockId: this.currentBlockId });
+    this.emit("block-end", { blockId: this.currentBlockId, isComplete });
     this.currentBlockId = null;
+  }
+
+  private hasBalancedFences(content: string): boolean {
+    const fences = (content.match(/```/g) || []).length;
+    return fences % 2 === 0;
   }
 }

@@ -4,7 +4,7 @@ import { bundledLanguages, createHighlighter } from "shiki/bundle/web";
 import { MarkdownParserCore } from "./parser-core";
 
 /**
- * Wraps marked.parse() and detects unclosed fenced-code blocks.
+ * Wraps marked.parse() .
  */
 export class MarkdownParser extends MarkdownParserCore {
   private initPromise: Promise<void>;
@@ -40,10 +40,9 @@ export class MarkdownParser extends MarkdownParserCore {
   }
 
   /**
-   * Parse markdown → HTML, and detect if there's an odd number
-   * of ``` fences (i.e. an unclosed code block).
+   * Parse markdown → HTML.
    */
-  async parse(markdown: string): Promise<{ html: string; isComplete: boolean }> {
+  async parse(markdown: string): Promise<{ html: string }> {
     await this.initPromise;
     return super.parse(markdown);
   }

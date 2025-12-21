@@ -38,7 +38,7 @@ export class HTMLRenderer {
     this.blocks.set(blockId, div);
   }
 
-  updateBlock(blockId: string, html: string): void {
+  updateBlock(blockId: string, html: string, _isComplete: boolean): void {
     const el = this.blocks.get(blockId);
     if (el) {
       el.innerHTML = html;

@@ -10,7 +10,9 @@ export interface BlockStartPayload {
 export interface BlockUpdatePayload {
   blockId: string;
   content: string;
+  isComplete: boolean;
 }
 export interface BlockEndPayload {
   blockId: string;
+  isComplete: boolean;
 }
