@@ -78,6 +78,14 @@ function hello() {
 | Data 1   | Data 2   | Data 3   |
 | More     | Content  | Here     |
 
+## Pictures
+
+![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg)
+![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg)
+![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg)
+![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg)
+![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg)
+
 ---
 
 **The End**
