@@ -95,17 +95,13 @@ export class SemidownCore {
   private onBlockUpdate = async (p: BlockUpdatePayload) => {
     if (this.state !== "processing") return;
     const { html } = await this.parser.parse(p.content);
-    this.renderer.updateBlock(p.blockId, html);
+    this.renderer.updateBlock(p.blockId, html, p.isComplete);
     // we don't finalize here; wait for explicit block-end
   };
 
   private onBlockEnd = async (p: BlockEndPayload) => {
     if (this.state !== "processing") return;
-    // For completeness, re‐parse the final content to see if it's now "complete"
-    const container = this.renderer["blocks"].get(p.blockId);
-    const finalMD = container?.innerText || "";
-    const { isComplete } = await this.parser.parse(finalMD);
-    this.renderer.finalizeBlock(p.blockId, isComplete);
+    this.renderer.finalizeBlock(p.blockId, p.isComplete);
   };
 
   private onEnd = () => {

@@ -8,7 +8,7 @@ export interface MarkdownParserCoreOptions {
 }
 
 /**
- * Wraps marked.parse() and detects unclosed fenced-code blocks.
+ * Wraps marked.parse().
  */
 export class MarkdownParserCore {
   private marked: Marked;
@@ -18,13 +18,10 @@ export class MarkdownParserCore {
   }
 
   /**
-   * Parse markdown → HTML, and detect if there's an odd number
-   * of ``` fences (i.e. an unclosed code block).
+   * Parse markdown → HTML.
    */
-  async parse(markdown: string): Promise<{ html: string; isComplete: boolean }> {
+  async parse(markdown: string): Promise<{ html: string }> {
     const html = await this.marked.parse(markdown);
-    const fences = (markdown.match(/```/g) || []).length;
-    const isComplete = fences % 2 === 0;
-    return { html, isComplete };
+    return { html };
   }
 }
