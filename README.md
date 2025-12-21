@@ -126,7 +126,6 @@ The included demo (`src/main.ts`) provides a UI to:
   - Full incremental parsing at the inline level is complex and error-prone, especially with partial tokens and nested formatting.
   - By incrementally parsing at the block level and re-rendering inlines, the library achieves a robust balance: fast updates for new blocks, and correct inline formatting as content grows.
 
-
 ## Contributing
 
 In lieu of a formal styleguide, take care to maintain the existing coding style. Lint and test your code.
@@ -134,7 +133,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 ## License
 
 Copyright (c) 2022-2025 Chuanqisun Sun \
-Copyright (C) 2022-2025 Ferdinand Prantl
+Copyright (C) 2025 Ferdinand Prantl
 
 Licensed under the [MIT License].
 
