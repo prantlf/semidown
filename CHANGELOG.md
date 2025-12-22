@@ -1,5 +1,11 @@
 # Changes
 
+## [2.1.0](https://github.com/prantlf/semidown/compare/v2.0.0...v2.1.0) (2025-12-22)
+
+### Features
+
+* Let inherited chunkers and renderers override original functionality ([1ac1c69](https://github.com/prantlf/semidown/commit/1ac1c6991c143469badcef324f1d04ca3ecaacd8))
+
 ## [2.0.0](https://github.com/prantlf/semidown/compare/v1.0.0...v2.0.0) (2025-12-21)
 
 ### Features
