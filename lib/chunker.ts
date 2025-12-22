@@ -15,13 +15,14 @@ export class MarkdownStreamChunker {
   private blockIdPrefix: string;
   private buffer = "";
   private nextBlockId = 1;
-  private currentBlockId: string | null = null;
   private listeners: Record<ChunkerEvent, Listener[]> = {
     "block-start": [],
     "block-update": [],
     "block-end": [],
     end: [],
   };
+
+  protected currentBlockId: string | null = null;
 
   constructor(options?: MarkdownStreamChunkerOptions) {
     this.blockIdPrefix = options?.blockIdPrefix ?? "block-";
@@ -110,19 +111,19 @@ export class MarkdownStreamChunker {
     }
   }
 
-  private emitStart(): void {
+  protected emitStart(): void {
     if (!this.currentBlockId) {
       this.currentBlockId = `${this.blockIdPrefix}${this.nextBlockId++}`;
       this.emit("block-start", { blockId: this.currentBlockId });
     }
   }
 
-  private emitUpdate(content: string, isComplete: boolean): void {
+  protected emitUpdate(content: string, isComplete: boolean): void {
     this.emitStart();
     this.emit("block-update", { blockId: this.currentBlockId!, content, isComplete });
   }
 
-  private emitEnd(isComplete: boolean): void {
+  protected emitEnd(isComplete: boolean): void {
     if (!this.currentBlockId) return;
     this.emit("block-end", { blockId: this.currentBlockId, isComplete });
     this.currentBlockId = null;

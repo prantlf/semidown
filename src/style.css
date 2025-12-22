@@ -2,6 +2,7 @@ body {
   margin: 0;
   height: 100vh;
   overflow: hidden;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
 #app {
@@ -9,12 +10,9 @@ body {
   display: flex;
   flex-direction: column;
 }
+
 * {
   box-sizing: border-box;
-}
-
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
 .shiki {
@@ -31,11 +29,11 @@ body {
   padding: 1rem 2rem;
   z-index: 100;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
 
-.header h1 {
-  margin: 0 0 1rem 0;
-  font-size: 1.5rem;
+  h1 {
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+  }
 }
 
 .controls {
@@ -62,16 +60,15 @@ body {
   flex-direction: column;
   padding: 1rem;
   overflow: hidden;
+
+  h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.2rem;
+  }
 }
 
 .left-panel {
   border-right: 1px solid #ccc;
-}
-
-.left-panel h2,
-.right-panel h2 {
-  margin: 0 0 1rem 0;
-  font-size: 1.2rem;
 }
 
 #markdown-input {
@@ -90,6 +87,23 @@ body {
   border: 1px solid #ccc;
   padding: 1rem;
   background: #fafafa;
+
+  table {
+    margin-block: 1rem;
+  }
+
+  p:has(img) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  img {
+    width: unset;
+    height: unset;
+    max-width: 100%;
+    max-height: 100%;
+  }
 }
 
 @media (max-width: 768px) {

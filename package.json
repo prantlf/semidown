@@ -34,6 +34,7 @@
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.3.0",
+    "chart.js": "^4.5.1",
     "rollup": "^4.53.3",
     "rollup-plugin-dts": "^6.3.0",
     "rollup-plugin-rm": "^1.0.2",

@@ -14,7 +14,8 @@ export class HTMLRenderer {
   private targetElement: HTMLElement;
   private datasetProperty: string;
   private completeCssClass: string;
-  private blocks = new Map<string, HTMLElement>();
+
+  protected blocks = new Map<string, HTMLElement>();
 
   constructor(targetElementOrOptions: HTMLElement | HTMLRendererOptions) {
     let targetElement: HTMLElement | undefined;
