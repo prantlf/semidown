@@ -1,5 +1,56 @@
-import { Semidown } from "../lib/semidown";
+import { Semidown, MarkdownStreamChunker, HTMLRenderer } from "../lib/index";
+import Chart from 'chart.js/auto';
 import "./style.css";
+
+class ChartChunker extends MarkdownStreamChunker {
+  chartBlocks = new Map();
+
+  protected emitUpdate(content: string, isComplete: boolean): void {
+    super.emitUpdate(content, isComplete);
+    // Remember fetched chart blocks for later re-rendering.
+    if (isComplete && content.startsWith('```chart')) {
+      this.chartBlocks.set(this.currentBlockId, content);
+    }
+  }
+}
+
+class ChartRenderer extends HTMLRenderer {
+  private chartBlocks: Map<string, string>;
+
+  constructor(outputContainer: HTMLElement, chartBlocks: Map<string, string>) {
+    super(outputContainer);
+    this.chartBlocks = chartBlocks;
+  }
+
+  async updateBlock(blockId: string, html: string, isComplete: boolean): Promise<void> {
+    if (isComplete) {
+      // Prefer rendering the chart as a picture to JSON data for the chart.
+      const chartBlock = this.chartBlocks.get(blockId);
+      if (chartBlock) {
+        try {
+          await this.renderChart(blockId, chartBlock);
+          return;
+        } catch (error: Error | any) {
+          console.error('Error rendering chart:', error);
+          const p = document.createElement('p');
+          p.textContent = `Error rendering chart: ${error.message}`;
+          html = p.outerHTML + html;
+        }
+      }
+    }
+    super.updateBlock(blockId, html, isComplete);
+  }
+
+  private async renderChart(blockId: string, chartBlock: string): Promise<void> {
+    const chartText = chartBlock.slice(8, -3); // ```chart ... ```
+    const chartData = JSON.parse(chartText);
+    const container = this.blocks.get(blockId);
+    const canvas = document.createElement('canvas');
+    container!.innerHTML = '';
+    container!.appendChild(canvas);
+    new Chart(canvas, chartData);
+  }
+}
 
 class DemoApp {
   private parser: Semidown | null = null;
@@ -80,11 +131,38 @@ function hello() {
 
 ## Pictures
 
-![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg)
-![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg)
-![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg)
-![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg)
-![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg) ![Vite](vite.svg)
+![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg)
+![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg)
+![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg)
+![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg)
+![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg) ![Vite](/semidown/vite.svg)
+
+## Chart
+
+\`\`\`chart
+{
+  "type": "doughnut",
+  "data": {
+    "labels": ["Italy", "France", "Spain", "USA", "Argentina"],
+    "datasets": [{
+      "backgroundColor": [
+        "#b91d47",
+        "#00aba9",
+        "#2b5797",
+        "#e8c3b9",
+        "#1e7145"
+      ],
+      "data": [55, 49, 44, 24, 15]
+    }]
+  },
+  "options": {
+    "title": {
+      "display": true,
+      "text": "World Wide Wine Production 2018"
+    }
+  }
+}
+\`\`\`
 
 ---
 
@@ -108,7 +186,10 @@ This demonstrates how the streaming parser handles various markdown elements as 
       return;
     }
 
-    this.parser = new Semidown(this.outputContainer);
+    const chunker = new ChartChunker();
+    const renderer = new ChartRenderer(this.outputContainer, chunker.chartBlocks);
+    this.parser = new Semidown({ chunker, renderer });
+
     this.updateStatus("Streaming...");
     this.updateButtons("streaming");
 
@@ -116,56 +197,48 @@ This demonstrates how the streaming parser handles various markdown elements as 
   }
 
   private pause(): void {
-    if (this.parser) {
-      this.parser.pause();
-      this.pauseStreaming();
-      this.updateStatus("Paused");
-      this.updateButtons("paused");
-    }
+    this.parser!.pause();
+    this.pauseStreaming();
+    this.updateStatus("Paused");
+    this.updateButtons("paused");
   }
 
   private resume(): void {
-    if (this.parser) {
-      this.parser.resume();
-      this.startStreaming();
-      this.updateStatus("Streaming...");
-      this.updateButtons("streaming");
-    }
+    this.parser!.resume();
+    this.startStreaming();
+    this.updateStatus("Streaming...");
+    this.updateButtons("streaming");
   }
 
   private stop(): void {
-    if (this.parser) {
-      // Fast forward: send all remaining text at once
-      if (this.currentIndex < this.currentText.length) {
-        const remainingText = this.currentText.slice(this.currentIndex);
-        this.parser.write(remainingText);
-        this.parser.end();
-        this.currentIndex = this.currentText.length;
+    // Fast forward: send all remaining text at once
+    if (this.currentIndex < this.currentText.length) {
+      const remainingText = this.currentText.slice(this.currentIndex);
+      if (this.parser!.getState() === 'paused') {
+        this.parser!.resume();
       }
+      this.parser!.write(remainingText);
+      this.parser!.end();
+      this.currentIndex = this.currentText.length;
 
-      // Stop the streaming interval
-      this.pauseStreaming();
-
-      // Update UI to complete state
-      this.updateStatus("Complete");
-      this.updateButtons("complete");
-    } else {
-      // If no parser exists, just reset everything
-      this.pauseStreaming();
-      this.currentIndex = 0;
-      this.outputContainer.innerHTML = "";
-      this.updateStatus("Ready");
-      this.updateButtons("ready");
+      setTimeout(() => {
+        this.outputContainer.scrollTo(0, this.outputContainer.scrollHeight);
+      }, 100);
     }
+
+    // Stop the streaming interval
+    this.pauseStreaming();
+
+    // Update UI to complete state
+    this.updateStatus("Complete");
+    this.updateButtons("complete");
   }
 
   private startStreaming(): void {
     this.streamingInterval = window.setInterval(() => {
       if (this.currentIndex >= this.currentText.length) {
         // Finished streaming
-        if (this.parser) {
-          this.parser.end();
-        }
+        this.parser!.end();
         this.pauseStreaming();
         this.updateStatus("Complete");
         this.updateButtons("complete");
@@ -176,9 +249,9 @@ This demonstrates how the streaming parser handles various markdown elements as 
       const chunkSize = Math.floor(Math.random() * 15) + 5; // Now returns integer 5-20
       const chunk = this.currentText.slice(this.currentIndex, this.currentIndex + chunkSize);
 
-      if (this.parser) {
-        this.parser.write(chunk);
-      }
+      this.parser!.write(chunk);
+
+      this.outputContainer.scrollTo(0, this.outputContainer.scrollHeight);
 
       this.currentIndex += chunk.length;
     }, this.streamSpeed);
@@ -195,14 +268,8 @@ This demonstrates how the streaming parser handles various markdown elements as 
     this.statusEl.textContent = status;
   }
 
-  private updateButtons(state: "ready" | "streaming" | "paused" | "complete"): void {
+  private updateButtons(state: "streaming" | "paused" | "complete"): void {
     switch (state) {
-      case "ready":
-        this.startBtn.disabled = false;
-        this.pauseBtn.disabled = true;
-        this.resumeBtn.disabled = true;
-        this.stopBtn.disabled = true;
-        break;
       case "streaming":
         this.startBtn.disabled = true;
         this.pauseBtn.disabled = false;
@@ -219,7 +286,7 @@ This demonstrates how the streaming parser handles various markdown elements as 
         this.startBtn.disabled = false;
         this.pauseBtn.disabled = true;
         this.resumeBtn.disabled = true;
-        this.stopBtn.disabled = false;
+        this.stopBtn.disabled = true;
         break;
     }
   }
