@@ -10,6 +10,8 @@ This is a fork of the original project with the following enhancements:
 * Default exports load external dependencies (`marked`, `marked-shiki` and `shiki/bundle/web`)
 * The `core` exports have no dependencies, neither external, nor bundled
 * The `bundle` exports include the dependencies (`marked`, `marked-shiki` and `shiki/bundle/web`)
+* Fixes rendering of fenced blocks with empty lines.
+* Lets override and extend parser, chunker and renderer.
 
 ## Install
 
@@ -75,26 +77,40 @@ const renderer = new HTMLRenderer({
 const semidown = new SemidownCore({ chunker, parser, renderer });
 ```
 
+## Installation
+
+You can install an NPM package by your favourite package manager, for example:
+
+    npm i @prantlf/semidown
+
+Or refer to it at `unpkg` on a web page:
+
+    https://unpkg.com/@prantlf/semidown@2.1.0/dist/...
+
+And choose a file from the table below instead of the three dots.
+
 ## Exports
 
-Exported files in the `dist` directory:
+Exported files in the `dist` directory, replace the three dots with the path to the `dist` directory above:
 
-| Distributed file        | Loading statement                                  | Format | Minified | Dependencies | Environment   |
-|:------------------------|:---------------------------------------------------|--------|----------|--------------|---------------|
-| `dist/index.cjs`        | `import '@prantlf/semidown'`                       |   EJS  |    no    |   external   |      node     |
-| `dist/index.js`         | `import '@prantlf/semidown'`                       |   EJS  |    no    |   external   | node, browser |
-| `dist/index.min.js`     | `import 'https://unpkg.com/.../dist/index.min.js'` |   EJS  |    yes   |   external   |    browser    |
-| `dist/index.umd.js`     | `<script src=".../dist/index.umd.js">`             |   UMD  |    no    |   external   |    browser    |
-| `dist/index.umd.min.js` | `<script src=".../dist/index.umd.min.js">`         |   UMD  |    yes   |   external   |    browser    |
-| `dist/index-core.cjs`        | `import '@prantlf/semidown/core'`                       | EJS | no  |    none    |      node     |
-| `dist/index-core.js`         | `import '@prantlf/semidown/core'`                       | EJS | no  |    none    | node, browser |
-| `dist/index-core.min.js`     | `import 'https://unpkg.com/.../dist/index-core.min.js'` | EJS | yes |    none    |    browser    |
-| `dist/index-core.umd.js`     | `<script src=".../dist/index-core.umd.js">`             | UMD | no  |    none    |    browser    |
-| `dist/index-core.umd.min.js` | `<script src=".../dist/index-core.umd.min.js">`         | UMD | yes |    none    |    browser    |
-| `dist/index-bundle.js`         | `import 'https://unpkg.com/.../dist/index-bundle.js'`     | EJS | no  | bundled |   browser    |
-| `dist/index-bundle.min.js`     | `import 'https://unpkg.com/.../dist/index-bundle.min.js'` | EJS | yes | bundled |   browser    |
-| `dist/index-bundle.umd.js`     | `<script src=".../dist/index-bundle.umd.js">`             | UMD | no  | bundled |   browser    |
-| `dist/index-bundle.umd.min.js` | `<script src=".../dist/index-bundle.umd.min.js">`         | UMD | yes | bundled |   browser    |
+| Distributed file   | Loading statement            | Format | Minified | Dependencies | Environment   |
+|:-------------------|:-----------------------------|--------|----------|--------------|---------------|
+| `index.cjs`        | `import '@prantlf/semidown'` |   EJS  |    no    |   external   |      node     |
+| `index.js`         | `import '@prantlf/semidown'` |   EJS  |    no    |   external   | node, browser |
+| `index.min.js`     | `import '.../index.min.js'`  |   EJS  |    yes   |   external   |    browser    |
+| `index.umd.js`     | `<script src=".../index.umd.js">`     |  UMD  |  no  | external |    browser    |
+| `index.umd.min.js` | `<script src=".../index.umd.min.js">` |  UMD  |  yes | external |    browser    |
+| `index-core.cjs`    | `import '@prantlf/semidown/core'` | EJS |  no   |     none     |      node     |
+| `index-core.js`     | `import '@prantlf/semidown/core'` | EJS |  no   |     none     | node, browser |
+| `index-core.min.js` | `import '.../index-core.min.js'`  | EJS |  yes  |     none     |    browser    |
+| `index-core.umd.js` | `<script src=".../index-core.umd.js">` | UMD | no |   none     |    browser    |
+| `index-core.umd.min.js` | `<script src=".../index-core.umd.min.js">` | UMD | yes | none | browser    |
+| `index-bundle.js`         | `import '.../index-bundle.js'`     | EJS | no  | bundled |    browser    |
+| `index-bundle.min.js`     | `import '.../index-bundle.min.js'` | EJS | yes | bundled |    browser    |
+| `index-bundle.umd.js`     | `<script src=".../index-bundle.umd.js">`     | UMD | no  | bundled | browser |
+| `index-bundle.umd.min.js` | `<script src=".../index-bundle.umd.min.js">` | UMD | yes | bundled | browser |
+
+UMD modules are named `semidown` for being imported as an AMD dependency or found in a global namespace as IIFE.
 
 ## Key Features
 
