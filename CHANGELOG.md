@@ -18,16 +18,7 @@
 
 ### BREAKING CHANGES
 
-This doesn't effect the usual usage of the `Semidown`
-class - updating the container element with HTML markup rendered from
-a Markdown stream. However, the interface of the inner objects was
-updated. The parser returns only `html`, not `isComplete` any more.
-The chunker adds `isComplete` to `block-update` and `block-end` event
-payloads. The renderer accept `isComplete` in both `updateBlock` and
-`finalizeBlock` methods.` Also, processing of fenced blocks changed
-- they're constantly re-parsed and re-rendered until the closing fence
-is detected. Although not a change on the API, the change of behaviour
-can be considered breaking too.
+This doesn't effect the usual usage of the `Semidown` class - updating the container element with HTML markup rendered from a Markdown stream. However, the interface of the inner objects was updated. The parser returns only `html`, not `isComplete` any more.  The chunker adds `isComplete` to `block-update` and `block-end` event payloads. The renderer accept `isComplete` in both `updateBlock` and `finalizeBlock` methods.` Also, processing of fenced blocks changed - they're constantly re-parsed and re-rendered until the closing fence is detected. Although not a change on the API, the change of behaviour can be considered breaking too.
 
 ## [1.0.0](https://github.com/prantlf/semidown/compare/v0.0.3...v1.0.0) (2025-12-05)
 

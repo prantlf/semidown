@@ -1,7 +1,7 @@
 import { MarkdownStreamChunker } from "./chunker";
 import type { MarkdownParserCore } from "./parser-core";
 import { HTMLRenderer } from "./renderer";
-import type { BlockEndPayload, BlockStartPayload, BlockUpdatePayload } from "./types";
+import type { BlockEndPayload, BlockStartPayload, BlockUpdatePayload, SemidownEvent, SemidownListener } from "./types";
 
 /**
  * Customize a Semidown instance.
@@ -22,6 +22,10 @@ export class SemidownCore {
   private parser: MarkdownParserCore;
   private renderer: HTMLRenderer;
   private state: "idle" | "processing" | "paused" | "destroyed" = "idle";
+  private updateCounter = 0;
+  private listeners: Record<SemidownEvent, SemidownListener[]> = {
+    "process-end": []
+  };
 
   constructor(options: SemidownCoreOptions) {
     let targetElement: HTMLElement | undefined;
@@ -49,6 +53,21 @@ export class SemidownCore {
   end(): void {
     if (this.state === "processing") {
       this.chunker.end();
+    }
+  }
+
+  on(event: SemidownEvent, fn: SemidownListener): void {
+    this.listeners[event].push(fn);
+  }
+
+  off(event: SemidownEvent, fn: SemidownListener): void {
+    this.listeners[event] = this.listeners[event].filter((l) => l !== fn);
+  }
+
+  private emit(event: SemidownEvent, payload?: any): void {
+    for (const fn of this.listeners[event]) {
+      // @ts-ignore
+      fn(payload);
     }
   }
 
@@ -94,9 +113,14 @@ export class SemidownCore {
 
   private onBlockUpdate = async (p: BlockUpdatePayload) => {
     if (this.state !== "processing") return;
+    ++this.updateCounter;
     const { html } = await this.parser.parse(p.content);
-    this.renderer.updateBlock(p.blockId, html, p.isComplete);
+    await this.renderer.updateBlock(p.blockId, html, p.isComplete);
     // we don't finalize here; wait for explicit block-end
+    --this.updateCounter;
+    // block-end and end events of the chunker are handled synchronously
+    // and may finish earlier than block-update
+    this.checkProcessEnd();
   };
 
   private onBlockEnd = async (p: BlockEndPayload) => {
@@ -106,5 +130,12 @@ export class SemidownCore {
 
   private onEnd = () => {
     this.state = "idle";
+    this.checkProcessEnd();
   };
+
+  private checkProcessEnd() {
+    if (this.state === "idle" && this.updateCounter === 0) {
+      this.emit("process-end");
+    }
+  }
 }
