@@ -1,5 +1,16 @@
 # Changes
 
+## [4.0.0](https://github.com/prantlf/semidown/compare/v3.0.0...v4.0.0) (2025-12-29)
+
+### Chores
+
+* Require ES2024 target ([5675dc2](https://github.com/prantlf/semidown/commit/5675dc240ef1d6175636d505fa7d0d0578dddb39))
+
+### BREAKING CHANGES
+
+Technically, there might be some difference, but this is
+unlikely to break abnything in the real-world code.
+
 ## [3.0.0](https://github.com/prantlf/semidown/compare/v2.1.0...v3.0.0) (2025-12-29)
 
 ### Features
