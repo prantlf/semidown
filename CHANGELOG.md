@@ -1,5 +1,16 @@
 # Changes
 
+## [3.0.0](https://github.com/prantlf/semidown/compare/v2.1.0...v3.0.0) (2025-12-29)
+
+### Features
+
+* Trigger process-end once async parsing and rendering is done ([0bcace9](https://github.com/prantlf/semidown/commit/0bcace9f3bb39a0e1abec055701f7459fb98caa6))
+
+### BREAKING CHANGES
+
+The TS type Listener was renamed to ChunkerListener.
+This is unlikely to break anything in the real-world applications.
+
 ## [2.1.0](https://github.com/prantlf/semidown/compare/v2.0.0...v2.1.0) (2025-12-22)
 
 ### Features
