@@ -213,17 +213,15 @@ This demonstrates how the streaming parser handles various markdown elements as 
   private stop(): void {
     // Fast forward: send all remaining text at once
     if (this.currentIndex < this.currentText.length) {
-      const remainingText = this.currentText.slice(this.currentIndex);
       if (this.parser!.getState() === 'paused') {
         this.parser!.resume();
       }
-      this.parser!.write(remainingText);
-      this.parser!.end();
-      this.currentIndex = this.currentText.length;
 
-      setTimeout(() => {
-        this.outputContainer.scrollTo(0, this.outputContainer.scrollHeight);
-      }, 100);
+      const remainingText = this.currentText.slice(this.currentIndex);
+      this.parser!.write(remainingText);
+
+      this.endStreaming();
+      this.currentIndex = this.currentText.length;
     }
 
     // Stop the streaming interval
@@ -238,7 +236,7 @@ This demonstrates how the streaming parser handles various markdown elements as 
     this.streamingInterval = window.setInterval(() => {
       if (this.currentIndex >= this.currentText.length) {
         // Finished streaming
-        this.parser!.end();
+        this.endStreaming();
         this.pauseStreaming();
         this.updateStatus("Complete");
         this.updateButtons("complete");
@@ -255,6 +253,16 @@ This demonstrates how the streaming parser handles various markdown elements as 
 
       this.currentIndex += chunk.length;
     }, this.streamSpeed);
+  }
+
+  private endStreaming(): void {
+    const onProcessEnd = () => {
+      this.parser!.off('process-end', onProcessEnd);
+      this.outputContainer.scrollTo(0, this.outputContainer.scrollHeight);
+    };
+    this.parser!.on('process-end', onProcessEnd);
+
+    this.parser!.end();
   }
 
   private pauseStreaming(): void {

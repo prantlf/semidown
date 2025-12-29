@@ -1,8 +1,8 @@
 /**
- * Emits events: 'block-start', 'block-update', 'block-end', 'end'
+ * Chunker emits events: 'block-start', 'block-update', 'block-end', 'end'
  */
 export type ChunkerEvent = "block-start" | "block-update" | "block-end" | "end";
-export type Listener = ((p: BlockStartPayload) => void) | ((p: BlockUpdatePayload) => void) | ((p: BlockEndPayload) => void) | (() => void);
+export type ChunkerListener = ((p: BlockStartPayload) => void) | ((p: BlockUpdatePayload) => void) | ((p: BlockEndPayload) => void) | (() => void);
 
 export interface BlockStartPayload {
   blockId: string;
@@ -16,3 +16,9 @@ export interface BlockEndPayload {
   blockId: string;
   isComplete: boolean;
 }
+
+/**
+ * Semidown emits events: 'process-end'
+ */
+export type SemidownEvent = "process-end";
+export type SemidownListener = (() => void);

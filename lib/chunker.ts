@@ -1,4 +1,4 @@
-import type { ChunkerEvent, Listener } from "./types";
+import type { ChunkerEvent, ChunkerListener } from "./types";
 
 /**
  * Customize a MarkdownStreamChunker instance.
@@ -15,7 +15,7 @@ export class MarkdownStreamChunker {
   private blockIdPrefix: string;
   private buffer = "";
   private nextBlockId = 1;
-  private listeners: Record<ChunkerEvent, Listener[]> = {
+  private listeners: Record<ChunkerEvent, ChunkerListener[]> = {
     "block-start": [],
     "block-update": [],
     "block-end": [],
@@ -96,11 +96,11 @@ export class MarkdownStreamChunker {
     this.emit("end");
   }
 
-  on(event: ChunkerEvent, fn: Listener): void {
+  on(event: ChunkerEvent, fn: ChunkerListener): void {
     this.listeners[event].push(fn);
   }
 
-  off(event: ChunkerEvent, fn: Listener): void {
+  off(event: ChunkerEvent, fn: ChunkerListener): void {
     this.listeners[event] = this.listeners[event].filter((l) => l !== fn);
   }
 

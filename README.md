@@ -31,6 +31,9 @@ const interval = setInterval(() => {
     clearInterval(interval);
   }
 }, 50);
+parser.on('process-end', () => {
+  console.log("markdown processing ended");
+})
 ```
 
 If you need to customise the `Marked` instance, or do not need `Shiki` for syntax highlighting, you can use the import `semidown/core` instead.
@@ -57,7 +60,7 @@ import {
 import { Marked } from "marked";
 
 const targetElement = document.getElementById("output");
-const chunker = new MarkdownStreamChunker({ blockIdPrefix: "blk=" });
+const chunker = new MarkdownStreamChunker({ blockIdPrefix: "blk-" });
 const marked = new Marked();
 const parser = new MarkdownParserCore({ marked });
 const renderer = new HTMLRenderer({
