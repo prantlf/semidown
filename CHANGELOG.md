@@ -1,5 +1,15 @@
 # Changes
 
+## [4.1.0](https://github.com/prantlf/semidown/compare/v4.0.0...v4.1.0) (2025-12-30)
+
+### Features
+
+* Trigger process-update and process-block once async parsing and rendering is done ([ba81680](https://github.com/prantlf/semidown/commit/ba8168099624e92c0b7dd2419736b0b8964b6789))
+
+### Bug Fixes
+
+* Remove unneeded async from onBlockEnd ([399ad65](https://github.com/prantlf/semidown/commit/399ad651eb24a96ac02686641f5db51ee44cb2bc))
+
 ## [4.0.0](https://github.com/prantlf/semidown/compare/v3.0.0...v4.0.0) (2025-12-29)
 
 ### Chores
