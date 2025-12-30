@@ -24,6 +24,8 @@ export class SemidownCore {
   private state: "idle" | "processing" | "paused" | "destroyed" = "idle";
   private updateCounter = 0;
   private listeners: Record<SemidownEvent, SemidownListener[]> = {
+    "process-update": [],
+    "process-block": [],
     "process-end": []
   };
 
@@ -118,6 +120,11 @@ export class SemidownCore {
     await this.renderer.updateBlock(p.blockId, html, p.isComplete);
     // we don't finalize here; wait for explicit block-end
     --this.updateCounter;
+    this.emit("process-update");
+    if (this.updateCounter === 0) {
+      // allow waiting for all blocks in the latest written chunk to finish
+      this.emit("process-block");
+    }
     // block-end and end events of the chunker are handled synchronously
     // and may finish earlier than block-update
     this.checkProcessEnd();

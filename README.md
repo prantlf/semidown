@@ -71,6 +71,12 @@ const renderer = new HTMLRenderer({
 const semidown = new SemidownCore({ chunker, parser, renderer });
 ```
 
+`SemidownCore`/`Semidown` instances trigger events once `write` or `end` methods were called to schedule another Markdown chunk to be processed:
+
+* `process-update` - one block update happened
+* `process-block` - one block was completed
+* `process-end` - `end` was called and all blocks were completed
+
 ## Key Features
 
 - **Semi-incremental Parsing:**

@@ -58,6 +58,7 @@ class DemoApp {
   private currentText = "";
   private currentIndex = 0;
   private streamSpeed = 50; // ms between chunks
+  private boundScrollToEnd = this.scrollToEnd.bind(this);
 
   private markdownInput: HTMLTextAreaElement;
   private outputContainer: HTMLElement;
@@ -232,7 +233,13 @@ This demonstrates how the streaming parser handles various markdown elements as 
     this.updateButtons("complete");
   }
 
+  private scrollToEnd() {
+    this.outputContainer.scrollTo(0, this.outputContainer.scrollHeight);
+  }
+
   private startStreaming(): void {
+    this.parser!.on('process-block', this.boundScrollToEnd);
+
     this.streamingInterval = window.setInterval(() => {
       if (this.currentIndex >= this.currentText.length) {
         // Finished streaming
@@ -249,16 +256,15 @@ This demonstrates how the streaming parser handles various markdown elements as 
 
       this.parser!.write(chunk);
 
-      this.outputContainer.scrollTo(0, this.outputContainer.scrollHeight);
-
       this.currentIndex += chunk.length;
     }, this.streamSpeed);
   }
 
   private endStreaming(): void {
     const onProcessEnd = () => {
+      this.parser!.off('process-block', this.boundScrollToEnd);
       this.parser!.off('process-end', onProcessEnd);
-      this.outputContainer.scrollTo(0, this.outputContainer.scrollHeight);
+      this.scrollToEnd();
     };
     this.parser!.on('process-end', onProcessEnd);
 
