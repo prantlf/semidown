@@ -17,8 +17,8 @@ class ChartChunker extends MarkdownStreamChunker {
 class ChartRenderer extends HTMLRenderer {
   private chartBlocks: Map<string, string>;
 
-  constructor(outputContainer: HTMLElement, chartBlocks: Map<string, string>) {
-    super(outputContainer);
+  constructor(targetElement: HTMLElement, chartBlocks: Map<string, string>) {
+    super(targetElement);
     this.chartBlocks = chartBlocks;
   }
 
@@ -61,7 +61,7 @@ class DemoApp {
   private boundScrollToEnd = this.scrollToEnd.bind(this);
 
   private markdownInput: HTMLTextAreaElement;
-  private outputContainer: HTMLElement;
+  private targetElement: HTMLElement;
   private startBtn: HTMLButtonElement;
   private pauseBtn: HTMLButtonElement;
   private resumeBtn: HTMLButtonElement;
@@ -70,7 +70,7 @@ class DemoApp {
 
   constructor() {
     this.markdownInput = document.getElementById("markdown-input") as HTMLTextAreaElement;
-    this.outputContainer = document.getElementById("output-container") as HTMLElement;
+    this.targetElement = document.getElementById("output-container") as HTMLElement;
     this.startBtn = document.getElementById("start-btn") as HTMLButtonElement;
     this.pauseBtn = document.getElementById("pause-btn") as HTMLButtonElement;
     this.resumeBtn = document.getElementById("resume-btn") as HTMLButtonElement;
@@ -188,7 +188,7 @@ This demonstrates how the streaming parser handles various markdown elements as 
     }
 
     const chunker = new ChartChunker();
-    const renderer = new ChartRenderer(this.outputContainer, chunker.chartBlocks);
+    const renderer = new ChartRenderer(this.targetElement, chunker.chartBlocks);
     this.parser = new Semidown({ chunker, renderer });
 
     this.updateStatus("Streaming...");
@@ -234,7 +234,7 @@ This demonstrates how the streaming parser handles various markdown elements as 
   }
 
   private scrollToEnd() {
-    this.outputContainer.scrollTo(0, this.outputContainer.scrollHeight);
+    this.targetElement.scrollTo(0, this.targetElement.scrollHeight);
   }
 
   private startStreaming(): void {
