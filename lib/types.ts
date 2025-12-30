@@ -18,7 +18,7 @@ export interface BlockEndPayload {
 }
 
 /**
- * Semidown emits events: 'process-end'
+ * Semidown emits events: 'process-update', 'process-block', 'process-end'
  */
-export type SemidownEvent = "process-end";
+export type SemidownEvent = "process-update" | "process-block" | "process-end";
 export type SemidownListener = (() => void);
