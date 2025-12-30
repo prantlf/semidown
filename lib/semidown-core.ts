@@ -130,7 +130,7 @@ export class SemidownCore {
     this.checkProcessEnd();
   };
 
-  private onBlockEnd = async (p: BlockEndPayload) => {
+  private onBlockEnd = (p: BlockEndPayload) => {
     if (this.state !== "processing") return;
     this.renderer.finalizeBlock(p.blockId, p.isComplete);
   };
