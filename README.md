@@ -45,6 +45,8 @@ parser.on('process-end', () => {
 })
 ```
 
+## Customisation
+
 If you need to customise the `Marked` instance, or do not need `Shiki` for syntax highlighting, you can use the import `@prantlf/semidown/core` instead.
 
 ```typescript
@@ -57,7 +59,27 @@ const parser = new MarkdownParserCore({ marked });
 const semidown = new SemidownCore({ targetElement, parser });
 ```
 
-For full customisation, you can create instances of `chunker`, `parser` and `renderer` on your own.
+How to prevent a flash of unfinished to finished inline elements like bold and italic text or hyperlinks with [remend](https://github.com/vercel/streamdown/tree/main/packages/remend):
+
+```ts
+import { Semidown, MarkdownStreamChunker } from "@prantlf/semidown/core";
+import remend from "remend";
+
+class MendingMarkdownStreamChunker extends MarkdownStreamChunker {
+  emitUpdate(content, isComplete) {
+    if (!isComplete) {
+      content = remend(content, { katex: false });
+    }
+    super.emitUpdate(content, isComplete);
+  }
+}
+
+const targetElement = document.getElementById("output");
+const chunker = new MendingMarkdownStreamChunker();
+const semidown = new Semidown({ targetElement, chunker });
+```
+
+For the full customisation, you can create instances of `chunker`, `parser` and `renderer` on your own.
 
 ```typescript
 import {
@@ -69,12 +91,14 @@ import {
 import { Marked } from "marked";
 
 const targetElement = document.getElementById("output");
-const chunker = new MarkdownStreamChunker({ blockIdPrefix: "blk-" });
+const chunker = new MarkdownStreamChunker({
+  blockIdPrefix: "block-"
+});
 const marked = new Marked();
 const parser = new MarkdownParserCore({ marked });
 const renderer = new HTMLRenderer({
   targetElement,
-  datasetProperty: "mdBlkId",
+  datasetProperty: "blockId",
   completeCssClass: "md-blk-complete"
 });
 const semidown = new SemidownCore({ chunker, parser, renderer });
@@ -94,7 +118,7 @@ You can install an NPM package by your favourite package manager, for example:
 
 Or refer to it at `unpkg` on a web page:
 
-    https://unpkg.com/@prantlf/semidown@2.1.0/dist/...
+    https://unpkg.com/@prantlf/semidown@4.1.0/dist/...
 
 And choose a file from the table below instead of the three dots.
 
