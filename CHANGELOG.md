@@ -1,5 +1,11 @@
 # Changes
 
+## [4.1.1](https://github.com/prantlf/semidown/compare/v4.1.0...v4.1.1) (2026-01-05)
+
+### Bug Fixes
+
+* Fix buffering of fenced blocks ([bd62d88](https://github.com/prantlf/semidown/commit/bd62d88eb7d74ff9250fbde8e9a02a743abdcdce))
+
 ## [4.1.0](https://github.com/prantlf/semidown/compare/v4.0.0...v4.1.0) (2025-12-30)
 
 ### Features

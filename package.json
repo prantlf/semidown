@@ -1,6 +1,6 @@
 {
   "name": "@prantlf/semidown",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "Semi-incremental markdown parser and renderer, optimized for LLM output.",
   "author": "Chuanqisun Sun <chuanqi.sun.dev@gmail.com> (https://github.com/chuanqisun)",
   "contributors": [
