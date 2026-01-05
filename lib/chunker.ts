@@ -51,14 +51,13 @@ export class MarkdownStreamChunker {
       }
 
       // Consider a block complete only if no fenced block is open.
-      const isComplete = this.hasBalancedFences(part)
-        ? fencedData === null
-        : fencedData !== null;
+      const balancedFences = this.hasBalancedFences(part)
+      const isComplete = balancedFences ? fencedData === null : fencedData !== null;
 
       this.emitUpdate(fencedData ?? part, isComplete);
 
       // Enter or leave a fenced block if unbalanced ticks are detected.
-      if (!isComplete) {
+      if (!balancedFences) {
         if (fencedData === null) {
           fencedData = part + "\n\n";
         } else {

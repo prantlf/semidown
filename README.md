@@ -66,7 +66,7 @@ import { Semidown, MarkdownStreamChunker } from "@prantlf/semidown/core";
 import remend from "remend";
 
 class MendingMarkdownStreamChunker extends MarkdownStreamChunker {
-  emitUpdate(content, isComplete) {
+  protected emitUpdate(content, isComplete) {
     if (!isComplete) {
       content = remend(content, { katex: false });
     }
