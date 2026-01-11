@@ -22,11 +22,12 @@ export class SemidownCore {
   private parser: MarkdownParserCore;
   private renderer: HTMLRenderer;
   private state: "idle" | "processing" | "paused" | "destroyed" = "idle";
-  private updateCounter = 0;
+  private blockStates = new Map();
   private listeners: Record<SemidownEvent, SemidownListener[]> = {
-    "process-update": [],
-    "process-block": [],
-    "process-end": []
+    "block-create": [],
+    "block-update": [],
+    "block-complete": [],
+    "end": []
   };
 
   constructor(options: SemidownCoreOptions) {
@@ -111,38 +112,61 @@ export class SemidownCore {
   private onBlockStart = (p: BlockStartPayload) => {
     if (this.state !== "processing") return;
     this.renderer.createBlock(p.blockId);
+    this.blockStates.set(p.blockId, { updateCounter: 0 });
+    this.emit("block-create", p);
   };
 
   private onBlockUpdate = async (p: BlockUpdatePayload) => {
     if (this.state !== "processing") return;
-    ++this.updateCounter;
+    const blockState = this.blockStates.get(p.blockId);
+    ++blockState.updateCounter;
     const { html } = await this.parser.parse(p.content);
     await this.renderer.updateBlock(p.blockId, html, p.isComplete);
     // we don't finalize here; wait for explicit block-end
-    --this.updateCounter;
-    this.emit("process-update");
-    if (this.updateCounter === 0) {
+    --blockState.updateCounter;
+    this.emit("block-update", { ...p, html });
+    if (p.isComplete) {
+        // allow waiting for all blocks in the latest written chunk to finish
+        if (blockState.ended && blockState.updateCounter === 0) {
+            this.finishBlock(p);
+        } else {
+            blockState.complete = true;
+        }
+    } else if (blockState.updateCounter === 0) {
       // allow waiting for all blocks in the latest written chunk to finish
-      this.emit("process-block");
+      if (blockState.ended && blockState.complete) {
+          this.finishBlock(p);
+      }
     }
+  };
+
+  private finishBlock(p: BlockEndPayload): void {
+    this.emit("block-complete", p);
+    this.blockStates.delete(p.blockId);
     // block-end and end events of the chunker are handled synchronously
     // and may finish earlier than block-update
-    this.checkProcessEnd();
+    this.checkEnd();
   };
 
   private onBlockEnd = (p: BlockEndPayload) => {
     if (this.state !== "processing") return;
     this.renderer.finalizeBlock(p.blockId, p.isComplete);
+    const blockState = this.blockStates.get(p.blockId);
+    if (blockState.complete && blockState.updateCounter === 0) {
+        this.finishBlock(p);
+    } else {
+        blockState.ended = true;
+    }
   };
 
   private onEnd = () => {
     this.state = "idle";
-    this.checkProcessEnd();
+    this.checkEnd();
   };
 
-  private checkProcessEnd() {
-    if (this.state === "idle" && this.updateCounter === 0) {
-      this.emit("process-end");
+  private checkEnd() {
+      if (this.state === "idle" && this.blockStates.size === 0) {
+          this.emit("end");
     }
   }
 }

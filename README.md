@@ -31,7 +31,7 @@ const interval = setInterval(() => {
     clearInterval(interval);
   }
 }, 50);
-parser.on('process-end', () => {
+parser.on('end', () => {
   console.log("markdown processing ended");
 })
 ```
@@ -71,11 +71,12 @@ const renderer = new HTMLRenderer({
 const semidown = new SemidownCore({ chunker, parser, renderer });
 ```
 
-`SemidownCore`/`Semidown` instances trigger events once `write` or `end` methods were called to schedule another Markdown chunk to be processed:
+`SemidownCore`/`Semidown` instances trigger events once `write` or `end` methods were called to schedule another Markdown chunk to be processed. Unline events triggered by `chunker` and `renderer`, these events are triggered when the asynchronous processing was finished:
 
-* `process-update` - one block update happened
-* `process-block` - one block was completed
-* `process-end` - `end` was called and all blocks were completed
+* `block-create` - one block was created
+* `block-update` - one block was updated
+* `block-complete` - one block was completed
+* `end` - `end` was called and all blocks were completed
 
 ## Key Features
 
