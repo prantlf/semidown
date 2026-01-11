@@ -238,7 +238,7 @@ This demonstrates how the streaming parser handles various markdown elements as 
   }
 
   private startStreaming(): void {
-    this.parser!.on('process-block', this.boundScrollToEnd);
+    this.parser!.on('block-update', this.boundScrollToEnd);
 
     this.streamingInterval = window.setInterval(() => {
       if (this.currentIndex >= this.currentText.length) {
@@ -261,12 +261,12 @@ This demonstrates how the streaming parser handles various markdown elements as 
   }
 
   private endStreaming(): void {
-    const onProcessEnd = () => {
-      this.parser!.off('process-block', this.boundScrollToEnd);
-      this.parser!.off('process-end', onProcessEnd);
+    const onEnd = () => {
+      this.parser!.off('block-update', this.boundScrollToEnd);
+      this.parser!.off('end', onEnd);
       this.scrollToEnd();
     };
-    this.parser!.on('process-end', onProcessEnd);
+    this.parser!.on('end', onEnd);
 
     this.parser!.end();
   }
