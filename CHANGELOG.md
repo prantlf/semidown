@@ -1,5 +1,23 @@
 # Changes
 
+## [5.0.0](https://github.com/prantlf/semidown/compare/v4.1.1...v5.0.0) (2026-01-11)
+
+### Features
+
+* Upgrade depenmdencies ([665d2c9](https://github.com/prantlf/semidown/commit/665d2c956df2c809d0b52760828394b5d9fa29de))
+
+### Bug Fixes
+
+* Rework events informing about async block processing ([8fa33cd](https://github.com/prantlf/semidown/commit/8fa33cd8d0c1a78c0a5ad92d0468803c56fd7aa6))
+
+### BREAKING CHANGES
+
+Events triggered by SemidownCore were renamed and extended:
+* N/A              -> "block-create"
+* "process-update" -> "block-update"
+* "process-block"  -> "block-complete"
+* "process-end"    -> "end"
+
 ## [4.1.1](https://github.com/prantlf/semidown/compare/v4.1.0...v4.1.1) (2026-01-05)
 
 ### Bug Fixes
