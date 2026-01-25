@@ -5,6 +5,7 @@ import type { ChunkerEvent, ChunkerListener } from "./types";
  */
 export interface MarkdownStreamChunkerOptions {
   blockIdPrefix?: string
+  withholdIncompleteFencedBlocks?: boolean
   withholdIncompleteLinks?: boolean
 }
 
@@ -13,6 +14,7 @@ export interface MarkdownStreamChunkerOptions {
  * emitting start/update/end events per block, based on blank lines.
  */
 export class MarkdownStreamChunker {
+  private withholdIncompleteFencedBlocks: boolean;
   private withholdIncompleteLinks: boolean;
   private blockIdPrefix: string;
   private buffer = "";
@@ -29,6 +31,7 @@ export class MarkdownStreamChunker {
 
   constructor(options?: MarkdownStreamChunkerOptions) {
     this.blockIdPrefix = options?.blockIdPrefix ?? "block-";
+    this.withholdIncompleteFencedBlocks = options?.withholdIncompleteFencedBlocks ?? true;
     this.withholdIncompleteLinks = options?.withholdIncompleteLinks ?? false;
   }
 
@@ -58,30 +61,35 @@ export class MarkdownStreamChunker {
       data = data.slice(idx + 2);
       // }
 
-      // If inside a fenced block, emit an update together with all
-      // previous blocks.
-      if (fencedData !== null) {
-        fencedData = fencedData + part + "\n\n";
-      }
-
-      // Consider a block complete only if no fenced block is open.
-      const balancedFences = this.hasBalancedFences(part)
-      const isComplete = balancedFences ? fencedData === null : fencedData !== null;
-
-      this.emitUpdate(fencedData ?? part, isComplete);
-
-      // Enter or leave a fenced block if unbalanced ticks are detected.
-      if (!balancedFences) {
-        if (fencedData === null) {
-          fencedData = part + "\n\n";
-        } else {
-          fencedData = null;
+      if (this.withholdIncompleteFencedBlocks) {
+        // If inside a fenced block, emit an update together with all
+        // previous blocks.
+        if (fencedData !== null) {
+          fencedData = fencedData + part + "\n\n";
         }
-      }
 
-      // Emit an end only if not inside a fenced block.
-      if (fencedData === null) {
-        this.emitEnd(isComplete);
+        // Consider a block complete only if no fenced block is open.
+        const balancedFences = this.hasBalancedFences(part)
+        const isComplete = balancedFences ? fencedData === null : fencedData !== null;
+
+        this.emitUpdate(fencedData ?? part, isComplete);
+
+        // Enter or leave a fenced block if unbalanced ticks are detected.
+        if (!balancedFences) {
+          if (fencedData === null) {
+            fencedData = part + "\n\n";
+          } else {
+            fencedData = null;
+          }
+        }
+
+        // Emit an end only if not inside a fenced block.
+        if (fencedData === null) {
+          this.emitEnd(isComplete);
+        }
+      } else {
+        this.emitUpdate(part, true);
+        this.emitEnd(true);
       }
     }
 

@@ -10,7 +10,7 @@ This is a fork of the original project with the following enhancements:
 * Default exports load external dependencies (`marked`, `marked-shiki` and `shiki/bundle/web`)
 * The `core` exports have no dependencies, neither external, nor bundled
 * The `bundle` exports include the dependencies (`marked`, `marked-shiki` and `shiki/bundle/web`)
-* Fixes rendering of fenced blocks with empty lines by.
+* Fixes rendering of fenced blocks with empty lines by withholding their parsing until they are complete.
 * Can withhold parsing of incomplete links to reduce twitching of the render output.
 * Lets override and extend parser, chunker and renderer.
 
@@ -94,6 +94,7 @@ import { Marked } from "marked";
 const targetElement = document.getElementById("output");
 const chunker = new MarkdownStreamChunker({
   blockIdPrefix: "block-",
+  withholdIncompleteFencedBlocks: true,
   withholdIncompleteLinks: false
 });
 const marked = new Marked();
