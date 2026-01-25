@@ -1,5 +1,13 @@
 # Changes
 
+## [5.1.0](https://github.com/prantlf/semidown/compare/v5.0.0...v5.1.0) (2026-01-25)
+
+### Features
+
+* Emit block-remains if block was incomplete ([627ab56](https://github.com/prantlf/semidown/commit/627ab560bb877c599a8574bcf55606ea71c0c894))
+* Allow to withhold parsing of incomplete links ([2c19f25](https://github.com/prantlf/semidown/commit/2c19f25a801d00cd5db60438e2b8b78d2a134f52))
+* Allow to disable withholding parsing of incomplete fenced blocks ([40e7f06](https://github.com/prantlf/semidown/commit/40e7f060cd0e8a5731a189c5a6ce95da15a7d0dc))
+
 ## [5.0.0](https://github.com/prantlf/semidown/compare/v4.1.1...v5.0.0) (2026-01-11)
 
 ### Features
