@@ -19,6 +19,7 @@ export class MarkdownStreamChunker {
     "block-start": [],
     "block-update": [],
     "block-end": [],
+    "block-remains": [],
     end: [],
   };
 
@@ -78,6 +79,7 @@ export class MarkdownStreamChunker {
     if (data.length > 0) {
       this.buffer = data;
       this.emitUpdate(data, false);
+      this.emitRemains(data);
     }
   }
 
@@ -120,6 +122,10 @@ export class MarkdownStreamChunker {
   protected emitUpdate(content: string, isComplete: boolean): void {
     this.emitStart();
     this.emit("block-update", { blockId: this.currentBlockId!, content, isComplete });
+  }
+
+  emitRemains(content: string): void {
+    this.emit("block-remains", { blockId: this.currentBlockId, content });
   }
 
   protected emitEnd(isComplete: boolean): void {
