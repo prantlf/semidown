@@ -5,6 +5,7 @@ import type { ChunkerEvent, ChunkerListener } from "./types";
  */
 export interface MarkdownStreamChunkerOptions {
   blockIdPrefix?: string
+  withholdIncompleteLinks?: boolean
 }
 
 /**
@@ -12,6 +13,7 @@ export interface MarkdownStreamChunkerOptions {
  * emitting start/update/end events per block, based on blank lines.
  */
 export class MarkdownStreamChunker {
+  private withholdIncompleteLinks: boolean;
   private blockIdPrefix: string;
   private buffer = "";
   private nextBlockId = 1;
@@ -27,6 +29,7 @@ export class MarkdownStreamChunker {
 
   constructor(options?: MarkdownStreamChunkerOptions) {
     this.blockIdPrefix = options?.blockIdPrefix ?? "block-";
+    this.withholdIncompleteLinks = options?.withholdIncompleteLinks ?? false;
   }
 
   /**
@@ -43,7 +46,17 @@ export class MarkdownStreamChunker {
       if (idx === -1) break;
 
       const part = data.slice(0, idx);
+      // const openingBracket = part.lastIndexOf('[');
+      // const closingBracket = part.lastIndexOf(']');
+      // if (openingBracket >= 0 && (closingBracket < 0 || closingBracket < openingBracket)) {
+      //   if (openingBracket === 0) {
+      //     break;
+      //   }
+      //   part = data.slice(0, openingBracket);
+      //   data = data.slice(openingBracket);
+      // } else {
       data = data.slice(idx + 2);
+      // }
 
       // If inside a fenced block, emit an update together with all
       // previous blocks.
@@ -78,9 +91,30 @@ export class MarkdownStreamChunker {
     }
     if (data.length > 0) {
       this.buffer = data;
-      this.emitUpdate(data, false);
+      const safeData = this.withholdIncompleteLinks ? this.getSafeData(data) : data;
+      this.emitUpdate(safeData, false);
       this.emitRemains(data);
     }
+  }
+
+  private getSafeData(data: string): string {
+    const openingBracket = data.lastIndexOf('[');
+    if (openingBracket >= 0) {
+      const closingBracket = data.lastIndexOf(']');
+      if (closingBracket < 0 || closingBracket < openingBracket || closingBracket === data.length - 1) {
+        return data.slice(0, openingBracket);
+      }
+      const openingParenthesis = data.lastIndexOf('(');
+      if (openingParenthesis >= 0) {
+        if (openingParenthesis - 1 === closingBracket) {
+          const closingParenthesis = data.lastIndexOf(')');
+          if (closingParenthesis < 0 || closingParenthesis < openingParenthesis) {
+            return data.slice(0, openingBracket);
+          }
+        }
+      }
+    }
+    return data;
   }
 
   /**
